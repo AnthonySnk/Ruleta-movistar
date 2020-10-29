@@ -10,16 +10,15 @@ var padding = {top:20, right:40, bottom:0, left:0},
             oldrotation = 0,
             picked = 100000,
             oldpick = [],
-            color = d3.scale.category20();//category20c()
-            //randomNumbers = getRandomNumbers();
-        var data = [
-                    {"label":"LAPTOP"}, 
-                    {"label":"CAMISA"}, 
-                    {"label":"JACKET"},
-                    {"label":"LAPIZ"},
-                    {"label":"MESA"},
+            color = d3.scale.category20();//Se obtienen los colores 
 
-                   ];
+        var data = [
+                    {"label":"UNA LAPTOP"}, 
+                    {"label":"UNA CAMISA"}, 
+                    {"label":"UNA JACKET"},
+                    {"label":"UN LAPIZ"},
+                    {"label":"UNA MESA"},
+                    ];
         var svg = d3.select('#chart')
             .append("svg")
             .data([data])
@@ -32,9 +31,9 @@ var padding = {top:20, right:40, bottom:0, left:0},
             .append("g");
             
         var pie = d3.layout.pie().sort(null).value(function(d){return 1;});
-        // declare an arc generator function
+        // declaramos una funcion arc generadora
         var arc = d3.svg.arc().outerRadius(r);
-        // select paths, use arc generator to draw
+        // seleccionamos el acamino, que usara arc para dibujar
         var arcs = vis.selectAll("g.slice")
             .data(pie)
             .enter()
@@ -44,7 +43,7 @@ var padding = {top:20, right:40, bottom:0, left:0},
         arcs.append("path")
             .attr("fill", function(d, i){ return color(i); })
             .attr("d", function (d) { return arc(d); });
-        // add the text
+        // Agregamos el texto
         arcs.append("text").attr("transform", function(d){
                 d.innerRadius = 0;
                 d.outerRadius = r;
@@ -57,9 +56,8 @@ var padding = {top:20, right:40, bottom:0, left:0},
             });
         container.on("click", spin);
         function spin(d){
-           
             container.on("click", null);
-            //all slices have been seen, all done
+            // Todos los precios ya han sido ganados
             console.log("OldPick: " + oldpick.length, "Data length: " + data.length);
             if(oldpick.length == data.length){
                 console.log("done");
@@ -85,32 +83,33 @@ var padding = {top:20, right:40, bottom:0, left:0},
                 .duration(5000)
                 .attrTween("transform", rotTween)
                 .each("end", function(){
-                    //mark question as seen
+                    //Mostramos al alerta de ganador
                     d3.select(".slice:nth-child(" + (picked + 1) + ") path")
                         .attr("fill", "#86888C");
-                    swal('¡Tú PREMIO ES!',`${data[picked].label}`,'success',{button:"Gracias a Movistar"})
+                    swal('¡Has ganado!',`${data[picked].label}`,'success',{button:"Gracias a Movistar"})
                     oldrotation = rotation;
-                    /* Get the result value from object "data" */
+                    /* El objeto selccionado en "data" */
                     console.log(data[picked].value)
-                    /* Comment the below line for restrict spin to sngle time */
                     container.on("click", spin);
+                    // Iniciamos la funcion de tirar confeti
                     confetti.start()
+                    //Indicamos la duracion del confetti
                     setTimeout(confetti.stop,3000)
                 });
         }
-        //make arrow
+        //Flecha
         svg.append("g")
             .attr("transform", "translate(" + (w + padding.left + padding.right) + "," + ((h/2)+padding.top) + ")")
             .append("path")
             .attr("d", "M-" + (r*.15) + ",0L0," + (r*.05) + "L0,-" + (r*.05) + "Z")
             .style({"fill":"black"});
-        //draw spin circle
+        //Dibujadno circulo
         container.append("circle")
             .attr("cx", 0)
             .attr("cy", 0)
             .attr("r", 60)
             .style({"fill":"white","cursor":"pointer"});
-        //spin text
+        //texto de la rueda central
         container.append("text")
             .attr("x", 0)
             .attr("y", 15)
@@ -120,21 +119,19 @@ var padding = {top:20, right:40, bottom:0, left:0},
         
         
         function rotTween(to) {
-          var i = d3.interpolate(oldrotation % 360, rotation);
-          return function(t) {
-            return "rotate(" + i(t) + ")";
-          };
+        var i = d3.interpolate(oldrotation % 360, rotation);
+        return function(t) {
+        return "rotate(" + i(t) + ")";};
         }
         
-        
         function getRandomNumbers(){
+            //generamos el numero ganador
             var array = new Uint16Array(1000);
             var scale = d3.scale.linear().range([360, 1440]).domain([0, 100000]);
             if(window.hasOwnProperty("crypto") && typeof window.crypto.getRandomValues === "function"){
                 window.crypto.getRandomValues(array);
                 console.log("works");
             } else {
-                //no support for crypto, get crappy random numbers
                 for(var i=0; i < 1000; i++){
                     array[i] = Math.floor(Math.random() * 100000) + 1;
                 }
